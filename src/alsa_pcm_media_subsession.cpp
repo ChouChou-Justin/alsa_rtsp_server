@@ -19,6 +19,7 @@ FramedSource* alsaPcmMediaSubsession::createNewStreamSource(unsigned clientSessi
 RTPSink* alsaPcmMediaSubsession::createNewRTPSink(Groupsock* rtpGroupsock,
                                                unsigned char rtpPayloadTypeIfDynamic,
                                                FramedSource* inputSource) {
+    logMessage("Creating new RTP sink with payload type: 97");
     return SimpleRTPSink::createNew(envir(), rtpGroupsock,
                                    97, // payload type
                                    fCapture->getSampleRate(),
@@ -26,6 +27,14 @@ RTPSink* alsaPcmMediaSubsession::createNewRTPSink(Groupsock* rtpGroupsock,
                                    fCapture->getChannels(),
                                    True, // set "rtptime" timestamp
                                    True); // set "marker" bit on last packet
+}
+
+void alsaPcmMediaSubsession::deleteStream(unsigned clientSessionId, void*& streamToken) {
+    logMessage("Deleting audio stream for client session: 97");
+    OnDemandServerMediaSubsession::deleteStream(clientSessionId, streamToken);
+    if (!fCapture->reset()) {
+        envir() << "Failed to reset ALSA capture device. Attempting to continue without reset.\n";
+    }
 }
 
 char const* alsaPcmMediaSubsession::getAuxSDPLine(RTPSink* rtpSink, FramedSource* inputSource) {

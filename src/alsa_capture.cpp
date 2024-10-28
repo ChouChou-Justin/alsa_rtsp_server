@@ -193,12 +193,66 @@ bool alsaCapture::startCapture() {
         }
         snd_mixer_close(mixer);
     }
-    
+
+    logMessage("Successfully start capture.");
     return true;
 }
 
 bool alsaCapture::stopCapture() {
     snd_pcm_drain(pcm_handle);
+    logMessage("Successfully stop capture.");
+    return true;
+}
+
+bool alsaCapture::reset() {
+    logMessage("Attempting to reset capture device.");
+
+    // Stop capture and close handle
+    stopCapture();
+
+    if (pcm_handle) {
+        snd_pcm_close(pcm_handle);
+        pcm_handle = nullptr;
+        params = nullptr;  // params is invalidated when handle is closed
+    }
+
+    // Wait for device to settle
+    usleep(500000);  // 500ms delay
+
+    // Reinitialize with error checking
+    int retries = 3;
+    bool init_success = false;
+    
+    while (retries --> 0 && !init_success) {
+        // Try to initialize
+        if (initialize()) {
+            init_success = true;
+            break;
+        }
+        
+        logMessage("Initialization attempt failed, retrying...");
+        usleep(100000);  // 100ms between retries
+    }
+    
+    if (!init_success) {
+        logMessage("Failed to reinitialize device after multiple attempts");
+        return false;
+    }
+
+    // Start capture with error checking
+    if (!startCapture()) {
+        logMessage("Failed to start capture during reset.");
+        return false;
+    }
+    
+    // Verify device state
+    snd_pcm_state_t state = snd_pcm_state(pcm_handle);
+    if (state != SND_PCM_STATE_RUNNING && state != SND_PCM_STATE_PREPARED) {
+        logMessage("Device in incorrect state after reset: " + std::to_string(state));
+        return false;
+    }
+
+    logMessage("Successfully reset capture.");
     return true;
 }
 

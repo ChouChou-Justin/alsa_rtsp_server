@@ -17,10 +17,12 @@ alsaPcmFramedSource::alsaPcmFramedSource(UsageEnvironment& env, alsaCapture* cap
         return;
     }
     fBuffer = new char[fFrameSize];
+    logMessage("Successfully created alsaPcmFramedSource.");
 }
 
 alsaPcmFramedSource::~alsaPcmFramedSource() {
     delete[] fBuffer;
+    logMessage("Successfully destroyed alsaPcmFramedSource.");
 }
 
 void alsaPcmFramedSource::doGetNextFrame() {

@@ -16,6 +16,7 @@ public:
     bool initialize();
     bool startCapture();
     bool stopCapture();
+    bool reset();
     int readFrames(char* outbuffer, int outFrames);
 
     // Getters for audio parameters

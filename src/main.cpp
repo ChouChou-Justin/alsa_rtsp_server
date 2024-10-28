@@ -8,7 +8,6 @@
 using namespace alsa_rtsp;
 
 char shouldExit = 0;
-std::chrono::steady_clock::time_point streamStartTime;
 
 void signalHandler(int signum) {
     logMessage("Interrupt signal (" + std::to_string(signum) + ") received");
@@ -18,9 +17,8 @@ void signalHandler(int signum) {
 int main(int argc, char** argv) {
     // Set up signal handling
     std::signal(SIGINT, signalHandler);
-    streamStartTime = std::chrono::steady_clock::now();
 
-    // Create Live555 environment
+    // Initialize and create LIVE555 environment
     TaskScheduler* scheduler = BasicTaskScheduler::createNew();
     UsageEnvironment* env = BasicUsageEnvironment::createNew(*scheduler);
 

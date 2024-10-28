@@ -16,10 +16,9 @@ protected:
     FramedSource* createNewStreamSource(unsigned clientSessionId, unsigned& estBitrate) override;
     RTPSink* createNewRTPSink(Groupsock* rtpGroupsock, unsigned char rtpPayloadTypeIfDynamic, FramedSource* inputSource) override;
     char const* getAuxSDPLine(RTPSink* rtpSink, FramedSource* inputSource) override;
-
+    void deleteStream(unsigned clientSessionId, void*& streamToken) override;
 private:
     alsaCapture* fCapture;
-    // char* fAuxSDPLine;
 };
 
 } // namespace alsa_rtsp

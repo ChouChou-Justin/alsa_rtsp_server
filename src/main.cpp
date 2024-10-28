@@ -15,7 +15,7 @@ void signalHandler(int signum) {
     shouldExit = 1;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char** argv) {
     // Set up signal handling
     std::signal(SIGINT, signalHandler);
     streamStartTime = std::chrono::steady_clock::now();

@@ -11,14 +11,13 @@ public:
 
 protected:
     alsaPcmFramedSource(UsageEnvironment& env, alsaCapture* capture);
-    ~alsaPcmFramedSource() override;
+    ~alsaPcmFramedSource();
 
 private:
     void doGetNextFrame() override;
 
     alsaCapture* fCapture;
     char* fBuffer;
-    unsigned fFrameSize;
 };
 
 } // namespace alsa_rtsp

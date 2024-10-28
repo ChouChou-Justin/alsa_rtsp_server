@@ -8,15 +8,20 @@ namespace alsa_rtsp {
 
 alsaCapture::alsaCapture(const char* device, unsigned int sampleRate, 
                         unsigned int channels, unsigned int bitDepth)
-    : pcm_device(device)
-    , sample_rate(sampleRate)
-    , num_channels(channels)
-    , bit_depth(bitDepth)
-    , pcm_handle(nullptr)
-    , params(nullptr)
-    , frames(NUM_OF_FRAMES_PER_PERIOD)
-    , periods(NUM_OF_PERIODS_IN_BUFFER) {
+    // Member initializer list - initializes class members before constructor body
+    : pcm_device(device)                          // Initialize ALSA device name
+    , sample_rate(sampleRate)                     // Initialize sampling rate
+    , num_channels(channels)                      // Initialize number of channels
+    , bit_depth(bitDepth)                         // Initialize bits per sample
+    , pcm_handle(nullptr)                         // Initialize PCM handle to null
+    , params(nullptr)                             // Initialize params to null
+    , frames(NUM_OF_FRAMES_PER_PERIOD)            // Initialize frames per period
+    , periods(NUM_OF_PERIODS_IN_BUFFER) {         // Initialize number of periods
+    // Calculate total buffer size in bytes:
+    // frames * channels * (bytes per sample) * number of periods
     buffer_size = frames * channels * (bitDepth / 8) * periods;
+    
+    // Resize the buffer to calculated size
     buffer.resize(buffer_size);
 }
 
@@ -205,13 +210,13 @@ int alsaCapture::readFrames(char* outbuffer, int outFrames) {
     snd_pcm_sframes_t avail = snd_pcm_avail(pcm_handle);
     
     if (avail < 0) {
+        // Handle overrun
         if (avail == -EPIPE) {
-            // Handle overrun
             auto now = std::chrono::steady_clock::now();
             auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_overrun);
             std::cerr << "Overrun #" << ++overrun_count 
-                          << " occurred after " << duration.count() << "ms" 
-                          << std::endl;
+                      << " occurred after " << duration.count() << "ms" 
+                      << std::endl;
             last_overrun = now;
         }
         
@@ -220,6 +225,7 @@ int alsaCapture::readFrames(char* outbuffer, int outFrames) {
             std::cerr << "Recovery failed: " << snd_strerror(avail) << std::endl;
             return avail;
         }
+        // Re-check available frames after recovery
         avail = snd_pcm_avail(pcm_handle);
     }
 
@@ -230,8 +236,9 @@ int alsaCapture::readFrames(char* outbuffer, int outFrames) {
         return pcm;
     }
 
+    // Calculate bytes to copy based on actual frames read
     size_t bytes_to_copy = pcm * num_channels * (bit_depth / 8);
-    
+    // std::cout << "Frames read: " << pcm << ", Bytes to copy: " << bytes_to_copy << std::endl;
     
     if (bytes_to_copy > 0) {
         // Verify output buffer size

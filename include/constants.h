@@ -3,14 +3,13 @@
 namespace alsa_rtsp {
 
 // Audio device parameters
-constexpr const char* AUDIO_DEVICE = "plughw:2,0";
-constexpr unsigned int AUDIO_SAMPLE_RATE = 16000;
-constexpr unsigned int AUDIO_CHANNELS = 1;
-constexpr unsigned int AUDIO_BIT_DEPTH = 16;
-
+#define AUDIO_DEVICE "plughw:2,0"
+#define AUDIO_SAMPLE_RATE 16000
+#define AUDIO_CHANNELS 1
+#define AUDIO_BIT_DEPTH 16
 // Buffer management
-constexpr unsigned int NUM_OF_PERIODS_IN_BUFFER = 64;  // Number of periods in buffer
-constexpr unsigned int NUM_OF_FRAMES_PER_PERIOD = 320; // Number of frames in one period
+#define NUM_OF_PERIODS_IN_BUFFER 64       // Number of periods in buffer
+#define NUM_OF_FRAMES_PER_PERIOD 320      // Number of frames in one period
 
 // Derived calculations for documentation
 

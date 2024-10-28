@@ -9,7 +9,7 @@ alsaPcmFramedSource* alsaPcmFramedSource::createNew(UsageEnvironment& env, alsaC
 
 alsaPcmFramedSource::alsaPcmFramedSource(UsageEnvironment& env, alsaCapture* capture)
     : FramedSource(env), fCapture(capture) {
-        // Use the full buffer size
+    // Use the full buffer size
     fFrameSize = fCapture->getBufferSize();
     // Add safety check
     if (fFrameSize > (1024 * 1024 * 10)) { // 10MB limit

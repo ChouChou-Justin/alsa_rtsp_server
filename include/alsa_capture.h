@@ -1,4 +1,4 @@
-#pragma once
+#pragma once // Preventing multiple inclusions of header files
 
 #include <alsa/asoundlib.h>
 #include <vector>

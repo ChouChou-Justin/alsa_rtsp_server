@@ -20,7 +20,7 @@ namespace alsa_rtsp {
 // [Total Buffer]: (640 bytes)
 // [Period 1][Period 2][Period 3]...[Period 64]            NUM_OF_PERIODS_IN_BUFFER determines how many periods fit in the total buffer
 // [320 frames][320 frames][320 frames]...[320 frames] Each period is NUM_OF_FRAMES_PER_PERIOD frames long
-// [2 bytes][2 bytes][2 bytes]...[2 bytes]                 Frame size (in bytes) = AUDIO_CHANNELS × (AUDIO_BIT_DEPTH/8) = 1 * (16/8) = 2 bytes
+// [320 * 2 bytes][320 * 2 bytes][320 * 2 bytes]...[320 * 2 bytes] Frame size (in bytes) = AUDIO_CHANNELS × (AUDIO_BIT_DEPTH/8) = 1 * (16/8) = 2 bytes
 // Larger NUM_OF_PERIODS_IN_BUFFER = more protection against XRUNs but higher latency
 // Smaller NUM_OF_PERIODS_IN_BUFFER = lower latency but higher risk of XRUNs
 

@@ -18,6 +18,11 @@ private:
 
     alsaCapture* fCapture;
     char* fBuffer;
+    struct timeval fInitialTime;
+    unsigned long long fCurTimestamp;
+
+    // RTP timing constants
+    static const unsigned int TIMESTAMP_INCREMENT = 1800;  // (90000/16000)*320 or 90000/50
 };
 
 } // namespace alsa_rtsp

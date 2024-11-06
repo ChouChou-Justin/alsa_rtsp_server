@@ -8,16 +8,17 @@ alsaPcmFramedSource* alsaPcmFramedSource::createNew(UsageEnvironment& env, alsaC
 }
 
 alsaPcmFramedSource::alsaPcmFramedSource(UsageEnvironment& env, alsaCapture* capture)
-    : FramedSource(env), fCapture(capture) {
-    // Use the full buffer size
+    : FramedSource(env), fCapture(capture), fCurTimestamp(16000) {  // Start at 1 second
     fFrameSize = fCapture->getBufferSize();
-    // Add safety check
     if (fFrameSize > (1024 * 1024 * 10)) { // 10MB limit
         handleClosure();
         return;
     }
     fBuffer = new char[fFrameSize];
-    logMessage("Successfully created alsaPcmFramedSource.");
+    gettimeofday(&fInitialTime, NULL);
+    
+
+    logMessage("Audio timing: " + std::to_string(TIMESTAMP_INCREMENT) + " ticks per packet");
 }
 
 alsaPcmFramedSource::~alsaPcmFramedSource() {
@@ -28,35 +29,29 @@ alsaPcmFramedSource::~alsaPcmFramedSource() {
 void alsaPcmFramedSource::doGetNextFrame() {
     if (!isCurrentlyAwaitingData()) return;
 
-    // Calculate optimal packet size (20ms of audio)
-    unsigned int samplesPerPacket = (fCapture->getSampleRate() * 20) / 1000;  // 20ms worth of samples
-    unsigned int bytesPerPacket = samplesPerPacket * fCapture->getChannels() * (fCapture->getBitDepth() / 8);
-    
-    // Ensure we don't exceed buffer limits
-    if (bytesPerPacket > fMaxSize) {
-        bytesPerPacket = fMaxSize;
-        samplesPerPacket = bytesPerPacket / (fCapture->getChannels() * (fCapture->getBitDepth() / 8));
-    }
-
-    // Read frames
+    // Read exactly 320 samples (one packet)
     int frames = fCapture->readFrames(fBuffer, NUM_OF_FRAMES_PER_PERIOD);
     if (frames < 0) {
         handleClosure();
         return;
     }
 
-    // Calculate actual frame size in bytes
+    // Calculate size in bytes (320 samples * channels * bytes_per_sample)
     fFrameSize = frames * fCapture->getChannels() * (fCapture->getBitDepth() / 8);
     
-    // Get current time
-    struct timeval tvNow;
-    gettimeofday(&tvNow, NULL);
-    fPresentationTime = tvNow;
+    // Calculate presentation time from start
+    unsigned long long elapsedMicros = (fCurTimestamp / 90) * 1000;  // Convert from 90kHz to microseconds
+    fPresentationTime = fInitialTime;
+    fPresentationTime.tv_sec += elapsedMicros / 1000000;
+    fPresentationTime.tv_usec += elapsedMicros % 1000000;
+    if (fPresentationTime.tv_usec >= 1000000) {
+        fPresentationTime.tv_sec += fPresentationTime.tv_usec / 1000000;
+        fPresentationTime.tv_usec %= 1000000;
+    }
 
-    // Calculate duration based on frames and sample rate
-    fDurationInMicroseconds = (unsigned int)((frames * 1000000) / fCapture->getSampleRate());
+    // Each packet is 20ms (320/16000 seconds)
+    fDurationInMicroseconds = 20000;
 
-    // Handle buffer size limits
     if (fFrameSize > fMaxSize) {
         fNumTruncatedBytes = fFrameSize - fMaxSize;
         fFrameSize = fMaxSize;
@@ -64,11 +59,12 @@ void alsaPcmFramedSource::doGetNextFrame() {
         fNumTruncatedBytes = 0;
     }
 
-    // Copy data
     memcpy(fTo, fBuffer, fFrameSize);
+    
+    // Increment by 1800 ticks (90000/50 or 320 samples * (90000/16000))
+    fCurTimestamp += TIMESTAMP_INCREMENT;
 
-    // Signal completion    
     FramedSource::afterGetting(this);
-    }
+}
 
 } // namespace alsa_rtsp

@@ -10,11 +10,11 @@ set(LIVE555_DIR "/home/pi/Desktop/live")
 # Include directories
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${ALSA_INCLUDE_DIRS}
     ${LIVE555_DIR}/UsageEnvironment/include
     ${LIVE555_DIR}/groupsock/include
     ${LIVE555_DIR}/liveMedia/include
     ${LIVE555_DIR}/BasicUsageEnvironment/include
+    ${ALSA_INCLUDE_DIRS}
 )
 
 # Find Live555 libraries
@@ -23,12 +23,13 @@ find_library(BASIC_USAGE_ENVIRONMENT_LIB BasicUsageEnvironment PATHS ${LIVE555_D
 find_library(GROUPSOCK_LIB groupsock PATHS ${LIVE555_DIR}/groupsock)
 find_library(LIVEMEDIA_LIB liveMedia PATHS ${LIVE555_DIR}/liveMedia)
 
-# Find OpenSSL
+# Find OpenSSL package
 find_package(OpenSSL REQUIRED)
 
 # Find Threads package
 find_package(Threads REQUIRED)
 
+# Find ALSA package
 find_package(ALSA REQUIRED)
 
 # Source files

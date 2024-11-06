@@ -25,8 +25,8 @@ RTPSink* alsaPcmMediaSubsession::createNewRTPSink(Groupsock* rtpGroupsock,
                                    fCapture->getSampleRate(),
                                    "audio", "L16",
                                    fCapture->getChannels(),
-                                   True, // set "rtptime" timestamp
-                                   True); // set "marker" bit on last packet
+                                   False, // Don't set "rtptime" timestamp
+                                   True); // Set "marker" bit on last packet
 }
 
 void alsaPcmMediaSubsession::deleteStream(unsigned clientSessionId, void*& streamToken) {

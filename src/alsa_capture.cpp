@@ -6,8 +6,7 @@
 
 namespace alsa_rtsp {
 
-alsaCapture::alsaCapture(const char* device, unsigned int sampleRate, 
-                        unsigned int channels, unsigned int bitDepth)
+alsaCapture::alsaCapture(const char* device, unsigned int sampleRate, unsigned int channels, unsigned int bitDepth)
     // Member initializer list - initializes class members before constructor body
     : pcm_device(device)                          // Initialize ALSA device name
     , sample_rate(sampleRate)                     // Initialize sampling rate
